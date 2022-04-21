@@ -13,20 +13,20 @@ import co.copper.test.services.{TestJavaService, TestService}
 @Component
 @Autowired
 class TestRoutes(
-  deribitService: TestService,
-  deribitJavaService: TestJavaService,
+  testService: TestService,
+  testJavaService: TestJavaService,
 ) extends RestRoutes {
 
   def anonymousRoutes(implicit context: Context) =
     pathEnd {
       post {
         complete {
-          deribitService.returnOk
+          testService.returnOk
         }
       } ~
       get {
         complete {
-          deribitJavaService.getOk.toScala
+          testJavaService.getOk.toScala
         }
       }
     }
