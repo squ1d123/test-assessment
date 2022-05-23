@@ -1,32 +1,29 @@
 package co.copper.test.services;
 
-import java.util.concurrent.CompletableFuture;
-
-import org.asynchttpclient.AsyncHttpClient;
+import co.copper.test.datamodel.Test;
+import co.copper.test.storage.TestJavaRepository;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import co.copper.test.storage.TestJavaRepository;
-
-
+@AllArgsConstructor
 @Service
 public class TestJavaService {
 
     private static final Logger log = LoggerFactory.getLogger(TestJavaService.class);
     private final TestJavaRepository testRepo;
-    private final AsyncHttpClient httpClient;
+    private final WebClient webClient = WebClient.create();
 
-    @Autowired
-    public TestJavaService(TestJavaRepository testRepo, AsyncHttpClient httpClient) {
-        this.testRepo = testRepo;
-        this.httpClient = httpClient;
+    public List<Test> getAll() {
+        return testRepo.findAll();
     }
 
-    public CompletableFuture<String> getOk() {
-        log.debug(testRepo.getById(1L).get(0).getVal());
-        return this.httpClient.prepareGet("https://postman-echo.com/get").execute().toCompletableFuture()
-            .handle((res, t) -> res.getResponseBody());
+    public Mono<String> postmanGet() {
+        return webClient.get().uri("https://postman-echo.com/get").retrieve()
+            .bodyToMono(String.class);
     }
 }
